@@ -4,6 +4,7 @@ import time
 import win32api
 import win32con
 zero_count = 0
+t = None
 while True:
         time.sleep(0.2)
         im = PIL.ImageGrab.grab()
@@ -35,6 +36,7 @@ while True:
        [ 118.8733442 ,  -43.85132179],
        [-112.49430466, -147.50353961],
        [  -1.04022727,   -2.59401229]]
+        n_unknow = 0
         m = [[-1 for col in range(8)] for row in range(8)]  
         for x in range(8):
                 for y in range(8):
@@ -45,19 +47,16 @@ while True:
                                 if tmin < min:
                                         m[y][x] = i
                                         min = tmin
-                        if min > 400: #uncertern
+                        if min > 1600: #uncertern
+                                n_unknow = n_unknow + 1
                                 m[y][x] = -1
-                        
-
+        print(n_unknow)
         def test_click(l,m,c,x,y,px,py):
-                startx = 930
-                starty = 72
-                r = 51
                 if c==-1 or x<0 or y<0 or px<0 or py<0:
                         return
                 if m[x][y] == c:
                         l.append((x,y,px,py))
-                        print("(%d,%d)->(%d,%d)"%(x,y,px,py))
+                        #print("(%d,%d)->(%d,%d)"%(x,y,px,py))
         l = []
         for x in range(8):
                 for y in range(7,-1,-1):
@@ -79,19 +78,23 @@ while True:
                                         test_click(l,m,c,x+1,y-1,x,y-1)
                         except IndexError:
                                 pass
-        print(l)
+        print('len:',len(l))
         if not len(l):
                 zero_count = zero_count + 1
                 if zero_count == 3:
                         win32api.keybd_event(90,0,0,0) #z键位码是90  
                         win32api.keybd_event(90,0,win32con.KEYEVENTF_KEYUP,0)  
                         print('z')
+                        zero_count=0
                 continue
         else:
                 zero_count = 0
-        import random
-        t = random.choice(l)
-        print(t)
+                def pick(list,last):
+                        import random
+                        return random.choice(list)
+                                
+        t = pick(l,t)
+        #print(t)
         win32api.SetCursorPos([startx+t[1]*r+25,starty+t[0]*r+25])    #为鼠标焦点设定一个位置
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0,0,0) 
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0,0,0)
@@ -99,7 +102,7 @@ while True:
         win32api.SetCursorPos([startx+t[3]*r+25,starty+t[2]*r+25])    #为鼠标焦点设定一个位置
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0,0,0) 
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0,0,0)
-        win32api.SetCursorPos([300,300])        
+        win32api.SetCursorPos([450,300])        
                   
           
 
